@@ -1,0 +1,1 @@
+import {spawnSync} from 'node:child_process';for(const f of ['src/core.mjs','src/app.mjs','src/catalog.mjs','src/controls.mjs','scripts/build.mjs']){const r=spawnSync(process.execPath,['--check',f],{stdio:'inherit'});if(r.status)process.exit(r.status);}console.log('JavaScript syntax checks passed.');

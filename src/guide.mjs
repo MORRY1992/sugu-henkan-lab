@@ -1,0 +1,2 @@
+const search=document.querySelector('#tool-search');
+if(search){const cards=[...document.querySelectorAll('[data-search]')];search.addEventListener('input',()=>{const q=search.value.trim().toLocaleLowerCase('ja');let n=0;for(const card of cards){const hit=card.dataset.search.toLocaleLowerCase('ja').includes(q);card.hidden=!hit;if(hit)n++;}document.querySelector('#search-result').textContent=q?`${n}件のツールが見つかりました。`:'';});}

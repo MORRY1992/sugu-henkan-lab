@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import qr from '../dist/tools/qrcode.mjs';
+test('QR生成は日本語・URL・長文のマトリクスに対応',()=>{qr.stringToBytes=qr.stringToBytesFuncs['UTF-8'];for(const s of ['https://example.com/','日本語のテスト😀','a'.repeat(1000)]){const q=qr(0,'M');q.addData(s,'Byte');q.make();assert.equal(q.getModuleCount()%4,1);assert.ok(q.getModuleCount()>=21);assert.equal(typeof q.isDark(0,0),'boolean');}});
