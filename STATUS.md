@@ -11,7 +11,7 @@
 - 収益/訪問/PV/eCPM：未確認。0としない。
 - SEO：title/description/canonical/OGP PNG/内部リンク/構造化データ/robots/sitemapを実装。Search Console未登録。索引/検索表示/クリック未確認。
 - 言語：日本語のみ。英語は第2段階。
-- 自動化：GitHub CI/週次テスト、公開後に有効化する日次HTTP検査を実装。予定実行での成功は未確認。既存ChatGPT枠の統合は次工程。
+- 自動化：GitHub CIが2回成功（Actions実見：077f86e / ca6d73f）。週次テスト、公開後に有効化する日次HTTP検査を実装。予定実行での成功は未確認。既存ChatGPT運営枠へ第4号の読取/週次/月次点検を追記済み。
 - 未確認のテスト：docs/QA.md。
 - 次：Cloudflare本人認証→GitHub連携二つ公開→本番検証→Adsterra申請→検索所有確認。
 
