@@ -34,3 +34,10 @@
 |処理ページ→別ツール→戻る|本文は引き継がれず、pagehideで破棄|
 |360/390/768/1280幅、ページ下端まで|横はみ出しなし、選択/実行/コピー操作可、注意/関連/フッターも確認|
 |実配信のtools CSP/noindex/通信|外部script/analyticsなし、connect-src none、本文ネットワーク送信なし|
+
+### 交差レビュー対応
+
+- 文字数上限など数値条件を入力中、blur前は古い成功結果とコピーが有効だった。数値入力のinputに限定して無効化し、既存のselect/checkboxのchange処理を維持。
+- VMで修正前にsuccessが残る失敗を確認。修正後は数値の入力直後に結果/指標を消去し、コピーを無効化、再実行で新しい上限を反映。select/checkboxの変更でも無効化することを確認。36テスト成功。
+- ルート側の読取ブラウザで https://sugu-henkan-lab.pages.dev/ に既存案内が表示されたとの確認を受領。改修版・処理側・実ヘッダー・GitHub配信コミットの確認とは区別する。
+- STATUS旧本文の「Adsterra未申請」とsrc/ads.jsonの受付/Pending記録の差を明示。設定はpending/enabled=false/code=nullのまま。管理画面の新確認や承認を主張しない。

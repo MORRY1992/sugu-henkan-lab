@@ -56,15 +56,15 @@ test('広告の誤有効化は個別レビューなしに生成しない',()=>{
 // Small event-driven DOM harness: exercises real app + core behavior without new dependencies.
 function app(tool,optionValues={}){
  const elements=new Map();
- function el(){return {value:'',textContent:'',hidden:false,disabled:false,dataset:{},children:[],listeners:{},classList:{toggle(){}},replaceChildren(...x){this.children=x;},append(...x){this.children.push(...x);},addEventListener(name,fn){this.listeners[name]=fn;},focus(){},select(){},setAttribute(){}};}
+ function el(){return {value:'',textContent:'',hidden:false,disabled:false,dataset:{},children:[],listeners:{},classList:{toggle(){}},replaceChildren(...x){this.children=x;},append(...x){this.children.push(...x);},addEventListener(name,fn){this.listeners[name]=fn;},focus(){},select(){},setAttribute(){},matches(selector){return selector==='input[type="number"][name]'&&this.type==='number'&&Boolean(this.name);}};}
  for(const id of ['input','output','status','qr-canvas','stats','table','result-empty','result-tag','empty-title','empty-copy','input-size','options','run','sample','reset','copy','tool-switch','save-settings','delete-settings','sample-data'])elements.set('#'+id,el());
  elements.get('#sample-data').textContent=JSON.stringify(' Ａ \nA\nＢ\nB');
- const opts=Object.entries(optionValues).map(([name,value])=>({...el(),name,type:typeof value==='boolean'?'checkbox':'select',checked:value,value}));
+ const opts=Object.entries(optionValues).map(([name,value])=>({...el(),name,type:typeof value==='boolean'?'checkbox':typeof value==='number'?'number':'select',checked:value,value:typeof value==='boolean'?value:String(value)}));
  const buttons=[elements.get('#copy')];let copied=null;const saved=new Map();const windowEvents={};
  const document={body:{dataset:{tool}},querySelector:s=>elements.get(s)||null,querySelectorAll:s=>s==='[data-result]'?buttons:s==='#options [name]'?opts:s==='#options input[type=checkbox]'?opts.filter(x=>x.type==='checkbox'):[],createDocumentFragment:el,createElement:el};
  const source=fs.readFileSync('src/app.mjs','utf8').replace(/^import .*;\n/gm,'');
  vm.runInNewContext(source,{...core,document,navigator:{clipboard:{writeText:async s=>{copied=s;}}},window:{addEventListener:(k,v)=>{windowEvents[k]=v;}},localStorage:{getItem:k=>saved.get(k)||null,setItem:(k,v)=>saved.set(k,v),removeItem:k=>saved.delete(k)},TextEncoder,Intl,console,qrcode(){},URL,Blob,setTimeout});
- return {elements,opts,buttons,document,saved,windowEvents,get copied(){return copied;},event(id,event='click',e={}){return elements.get('#'+id).listeners[event](e);}};
+ return {elements,opts,buttons,document,saved,windowEvents,get copied(){return copied;},event(id,event='click',e={}){return elements.get('#'+id).listeners[event]?.(e);}};
 }
 
 test('実行→入力変更で古い結果とコピーを無効化し、消去で本文を残さない',async()=>{
@@ -79,4 +79,14 @@ test('JSONエラーは入力を維持し、訂正後のショートカット実�
 
 test('連続変換はチェック項目だけ任意保存し、pagehideで本文と結果を破棄',()=>{
  const a=app('pipeline',{width:true,trim:true,dedupe:true,ignoreCase:false});a.event('sample');a.event('run');assert.equal(a.elements.get('#output').value,'A\nB');a.event('save-settings');assert.deepEqual(JSON.parse(a.saved.get('sugu-pipeline-v1')),{width:true,trim:true,dedupe:true,ignoreCase:false});assert.equal(a.saved.size,1);a.windowEvents.pagehide();assert.equal(a.elements.get('#input').value,'');assert.equal(a.elements.get('#output').value,'');assert.equal(a.buttons[0].disabled,true);a.event('delete-settings');assert.equal(a.saved.size,0);
+});
+
+
+test('数値条件はblur前のinputで旧結果とコピーを無効にし、selectとcheckboxのchangeも維持',async()=>{
+ const a=app('text-counter',{limit:10});a.elements.get('#input').value='こんにちは';a.event('run');assert.match(a.elements.get('#output').value,/remaining: 5/);assert.equal(a.buttons[0].disabled,false);
+ const limit=a.opts.find(x=>x.name==='limit');limit.value='3';a.event('options','input',{target:limit});
+ assert.equal(a.document.body.dataset.state,'empty');assert.equal(a.elements.get('#output').value,'');assert.equal(a.elements.get('#stats').children.length,0);assert.equal(a.buttons[0].disabled,true);assert.equal(a.elements.get('#input').value,'こんにちは');await a.event('copy');assert.equal(a.copied,null);
+ a.event('run');assert.match(a.elements.get('#output').value,/remaining: -2/);assert.equal(a.document.body.dataset.state,'success');
+ const b=app('width-converter',{direction:'half',alpha:true,symbol:true,kana:true,space:true});b.elements.get('#input').value='Ａ';b.event('run');b.opts.find(x=>x.name==='direction').value='full';b.event('options','change');assert.equal(b.buttons[0].disabled,true);assert.equal(b.document.body.dataset.state,'empty');
+ b.event('run');assert.equal(b.buttons[0].disabled,false);b.opts.find(x=>x.name==='alpha').checked=false;b.event('options','change');assert.equal(b.buttons[0].disabled,true);assert.equal(b.elements.get('#output').value,'');
 });
