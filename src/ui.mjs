@@ -1,0 +1,26 @@
+import {tools,articles} from './catalog.mjs';
+export const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const paths={
+ 'text-counter':'M5 6h14M12 6v13M8 19h8M5 11h3m-1-2v4',
+ 'width-converter':'M3 8h7m-4-3L3 8l3 3m15 5h-7m4-3 3 3-3 3M11 5l-3 14m8-14-3 14',
+ 'whitespace-cleaner':'M4 5h16M4 10h11m-3 5H5m3-3-3 3 3 3m11-8v10h-5',
+ 'duplicate-remover':'M9 4H4v13h5m6 3h5V7h-5M10 8l5 8m0-8-5 8',
+ 'csv-tsv':'M3 5h18v14H3zM3 10h18M3 14h18M9 5v14m6-14v14',
+ 'json-formatter':'M8 3H6v6l-3 3 3 3v6h2m8-18h2v6l3 3-3 3v6h-2M11 9h2m-2 6h2',
+ 'url-codec':'M10 7l2-2a5 5 0 0 1 7 7l-3 3m-2 2-2 2a5 5 0 0 1-7-7l3-3m1 6 6-6',
+ 'qr-generator':'M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 14v3h3v4m-6-1v-8h5m4 0v5h-3m3 4h-1',
+ pipeline:'M4 6h5m6 0h5M9 3h6v6H9zM4 18h5m6 0h5M9 15h6v6H9zM4 6v12m16-12v12',
+ arrow:'M5 12h14m-5-5 5 5-5 5',external:'M8 5H4v15h15v-4M13 4h7v7m0-7L10 14',
+ shield:'M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6zM8 12l3 3 5-6',search:'M16 16l5 5M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0',
+ check:'M5 12l4 4L19 6',copy:'M9 9h11v12H9zM5 16H3V3h11v2',empty:'M5 3h10l4 4v14H5zM14 3v5h5M8 12h8m-8 4h5',
+};
+export function icon(name,cls=''){return `<svg class="icon ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${paths[name]||paths.arrow}"/></svg>`;}
+export const mark=`<svg class="brand-mark" viewBox="0 0 40 40" fill="none" aria-hidden="true"><rect width="40" height="40" rx="10" fill="currentColor"/><path d="M10 13h17l-4-4m7 18H13l4 4M10 13v6m20 8v-6" stroke="#DDF7A9" stroke-width="2.3" stroke-linecap="square"/><path d="m16 22 3 3 6-9" stroke="#DDF7A9" stroke-width="2.3"/></svg>`;
+export const pipelineTool={slug:'pipeline',name:'まとめて連続変換',short:'いつもの整理を、ひと続きに',category:'連続変換',desc:'全半角・空白・重複行を、選んだ手順でまとめて整理。本文を保存せず、変換方法だけをこのブラウザに保存できます。',example:' Ａ \nA\nＢ\nB',steps:['入力し、実行する変換を選びます。','①半角→②空白→③重複の順で実行します。','必要なら変換方法だけを保存します。'],note:'全角半角・空白を整えた結果、元々違った行が重複になる場合があります。結果を確認してください。',faq:'保存するのは設定のみです。入力・結果をlocalStorage、URL、Cookieへ保存しません。ブラウザを閉じる・再読込すると本文は残りません。'};
+export const all=[...tools,pipelineTool];
+export const compactName=t=>({'text-counter':'文字数・行数','width-converter':'全角・半角','whitespace-cleaner':'改行・空白','duplicate-remover':'重複行','csv-tsv':'CSV・TSV','json-formatter':'JSON整形','url-codec':'URL変換','qr-generator':'QRコード',pipeline:'連続変換'}[t.slug]);
+export function rail({processing=false,slug='',origin=''}){return `<aside class="tool-rail" aria-label="ツールメニュー"><a class="rail-home" href="${origin}/">${mark}<span>すぐ変換ラボ<small>TEXT & DATA WORKBENCH</small></span></a><div class="rail-label">WORKSPACE <span>08 + 01</span></div><nav aria-label="ツール一覧">${all.map((t,i)=>`${i===8?'<div class="rail-divider"></div>':''}<a href="${origin}${processing?'':'/tools'}/${t.slug}/" ${t.slug===slug?'aria-current="page"':''}>${icon(t.slug)}<span>${compactName(t)}</span>${t.slug===slug?'<i aria-hidden="true"></i>':''}</a>`).join('')}</nav><div class="rail-bottom">${icon('shield')}<p>文章は、<br>ブラウザの中で。<small>処理画面は本文を送信しません</small></p></div></aside>`;}
+export const toolCard=(t,{processing=false,search=false}={})=>`<a class="tool-card" href="${processing?'':'/tools'}/${t.slug}/" ${search?`data-search="${esc(t.name+' '+t.desc+' '+t.category+' '+t.slug)}"`:''}><div class="card-top"><span class="tool-symbol">${icon(t.slug)}</span><span class="mono">${t.category}</span>${icon('arrow','card-arrow')}</div><h3>${t.name}</h3><p>${t.desc}</p><span class="card-action">${t.short}</span></a>`;
+export const related=(slug,{processing=false}={})=>{const slugs=slug==='pipeline'?['width-converter','whitespace-cleaner','duplicate-remover']:slug==='csv-tsv'?['duplicate-remover','whitespace-cleaner','json-formatter']:['width-converter','text-counter','pipeline','qr-generator'].filter(s=>s!==slug).slice(0,3);return `<section class="next-section"><div class="section-heading"><div><span class="eyebrow">NEXT TASK</span><h2>次の作業へ。</h2></div><p>必要な結果をコピーしてから移動してください。</p></div><div class="related-grid">${slugs.map(s=>toolCard(all.find(t=>t.slug===s),{processing})).join('')}</div></section>`;};
+export function footer(guide,processing){return `<footer class="site-footer"><div class="footer-main"><div><a class="footer-brand" href="${processing?'/':guide+'/'}">${mark}<span>すぐ変換ラボ</span></a><p>文字を整える。データをつなぐ。<br>毎日の小さな作業に、迷わない道具を。</p></div><div class="footer-nav"><span class="eyebrow">INFORMATION</span><a href="${guide}/about/">運営について</a><a href="${guide}/privacy/">プライバシーとデータの扱い</a><a href="${guide}/contact/">お問い合わせ</a></div><div class="footer-note">${icon('shield')}<p>入力本文の送信・自動保存なし。<br>連続変換は設定だけを任意で保存できます。</p></div></div><div class="footer-bottom"><span>© 2026 すぐ変換ラボ</span><span>BUILT FOR YOUR EVERYDAY WORK.</span></div></footer>`;}
+export function guideNotes(){return `<section class="section" id="guides"><div class="section-heading"><div><span class="eyebrow">FIELD NOTES</span><h2>しくみがわかると、使いやすい。</h2></div><p>変換前に知っておきたいこと。</p></div><div class="notes-grid">${articles.map((a,i)=>`<a class="note-card" href="/guides/${a.slug}/"><span class="mono">NOTE / 0${i+1}</span><h3>${esc(a.title)}</h3>${icon('arrow')}</a>`).join('')}</div></section>`;}

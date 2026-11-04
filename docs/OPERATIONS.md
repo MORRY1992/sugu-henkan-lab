@@ -49,3 +49,14 @@ Webサイト日次運営・検索対策（6ae0614020f481918e93dcb3ca9e94ea）の
 
 ## 復旧
 問題を確認したらCloudflare Pagesの直前の正常なデプロイへrollbackできる。GitHubはforceせず修正またはrevertコミットで戻す。セキュリティヘッダーを弱めて機能不具合を隠さない。入力データは収集していないため復元不可。業務データをIssueに貼らせず架空のサンプルで再現。
+
+## 20261104 改修後の公開ゲート
+
+1. `npm ci --ignore-scripts --no-audit --no-fund` → `npm run build` → `npm test` → `npm run check` → `npm run check:release`。validate CIも同じゲートを実行。
+2. PRのbase/head SHAと差分、mainの現在headを確認してからマージ。履歴を書き換えず、不一致なら差分を再読する。
+3. 既存の案内/処理二つのCloudflareプロジェクト、GitHub連携、production branch=main、build command=npm run build、output=dist/guide / dist/tools、Node 22を照合。source commitとデプロイcommitを分けて記録する。
+4. 案内トップ・個別・ノート・privacy/contact、処理の全機能をPC/モバイル幅で確認。未実行→成功→入力変更→再実行→消去と、JSON/URL/CSVのエラーからの復帰を確認。
+5. 処理側は実レスポンスのCSP/noindex/no-referrerも確認。入力時・実行時の通信追加がないことを確認する。クリップボード・PNG/テキスト保存・QRの実読取は静的テスト成功と区別して記録。
+6. 正式公開の判定は二つの実URL・配信commit・実ヘッダーの確認後に行う。候補URLのまま公開済みとは記録しない。広告pending・未接続解析・未確認収益を成功/0としない。
+
+UI/文言の更新時は `src/ui.mjs`、`scripts/build.mjs`、`public/style.css` が主な編集先。機能/上限は `src/core.mjs`、条件は `src/controls.mjs`、ツール名/仕様は `src/catalog.mjs`。広告を共通テンプレートへ入れない。GSC確認タグを追加する場合も案内側だけへ、空値や重複を入れない。本文の比較・サンプル・スクリーンショットに実ユーザーデータを使わない。詳細は [改修記録](REDESIGN_20261104.md)。
