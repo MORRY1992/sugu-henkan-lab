@@ -11,6 +11,6 @@
     "check:release": "node scripts/release.mjs"
   },
   "devDependencies": {
-    "qrcode-generator": "1.4.4"
+    "qrcode-generator": "2.0.4"
   }
 }
