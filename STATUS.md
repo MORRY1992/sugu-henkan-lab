@@ -5,9 +5,9 @@
 - GitHub：MORRY1992/sugu-henkan-labを作成しadmin/push権限を確認。実装ソースをmainへ保存・STATUS.md再取得で確認済み（077f86e9366de35d80a269873af7dab2f042295e）。
 - 公開：初回記録では未公開。20261104のルート側読取ブラウザ確認では、下記案内URLで既存のすぐ変換ラボ案内が表示された。GitHubソースとCloudflare配信コミットの対応は未確認。
 - 案内URL：https://sugu-henkan-lab.pages.dev/（ルート側の読取ブラウザで既存案内の表示を確認。改修版の配信確認とは別）
-- 処理候補URL：https://sugu-henkan-tools.pages.dev/（未確認）
+- 処理候補URL：https://sugu-henkan-tools.pages.dev/（2026-11-05に2回のHTTP503を観測。サイト停止か観測環境の制限かは未確定。配信元・本番ヘッダー・機能の確認待ち）
 - 分離：異なるオリジンへ配信する生成物を作成、CSPで外部通信を禁止。実際の配信ヘッダーと広告稼働時の検証は未確認。
-- Adsterra：旧本文の「未申請」はsrc/ads.json内の後続記録と不一致。現在のソースはstatus=pending / enabled=false / code=null。noteには2026-11-02に既存Publisher3526726でサイト追加を受け付け、管理画面がPendingだったとの記録がある。本改修では管理画面を再確認しておらず、現在の申請・承認・専用ID・専用コード・実配信状態は未確認。新しい承認や申請は行っていない。
+- Adsterra：2026-11-05に既存Publisher3526726管理画面で案内ドメインのApproved、site6169762、SocialBar_1（32053979）Activeを確認。専用コードはsrc/ads.jsonのacquiredCodeへ取得記録として保存。配信用code=null / enabled=falseを維持。実配信・計測・収益は未確認。詳細はdocs/AD_STATUS_20261105.md。
 - 収益/訪問/PV/eCPM：未確認。0としない。
 - SEO：title/description/canonical/OGP PNG/内部リンク/構造化データ/robots/sitemapを実装。Search Console未登録。索引/検索表示/クリック未確認。
 - 言語：日本語のみ。英語は第2段階。

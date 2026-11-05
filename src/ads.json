@@ -1,7 +1,7 @@
 {
   "network": "Adsterra",
   "publisherId": 3526726,
-  "status": "pending",
+  "status": "approved",
   "enabled": false,
   "code": null,
   "permittedOrigin": "https://sugu-henkan-lab.pages.dev",
@@ -10,9 +10,18 @@
   "additionalCandidate": "Native Banner",
   "revenue": null,
   "period": null,
-  "note": "2026-11-02: existing Publisher account website addition accepted. Category Converter, Social Bar, adult ads OFF. Dashboard status Pending. IDs/code/approval/delivery unconfirmed. Processor origin excluded.",
+  "note": "2026-11-05: Publisher 3526726管理画面で対象ドメインApproved、SocialBar_1 Activeを確認。専用コードをacquiredCodeへ保存。enabled=false / code=nullは維持し未配信。adultAds=falseは既存設定で今回の管理画面カテゴリ再確認とは区別。処理オリジンへ広告は追加しない。",
   "adultAds": false,
   "submittedDomain": "sugu-henkan-lab.pages.dev",
-  "siteId": null,
-  "adUnitId": null
+  "siteId": 6169762,
+  "adUnitId": 32053979,
+  "codeRetrieved": true,
+  "approvalVerifiedAt": "2026-11-05T05:59:42.910534+00:00",
+  "acquiredCode": "<script data-cfasync=\"false\" src=\"https://bauval.org/14/bb6a44dad5ae184a76b9f80f129436e8\"></script>",
+  "deliveryVerifiedAt": null,
+  "trackingVerifiedAt": null,
+  "activationBlockers": [
+    "処理オリジンのHTTP503観測原因・配信設定と実ヘッダー確認",
+    "案内側限定の広告カテゴリ・構成、CSP、スマートフォン操作検証"
+  ]
 }

@@ -38,7 +38,7 @@ test('処理側404も案内コードを読み込まずnoindexと厳格CSPを維�
 });
 
 test('広告フラグ・専用オリジン・本文を保存しない設定契約を維持',()=>{
- const ads=JSON.parse(fs.readFileSync('src/ads.json','utf8'));assert.equal(ads.enabled,false);assert.equal(ads.code,null);assert.equal(ads.status,'pending');assert.equal(ads.permittedOrigin,guide);assert.equal(ads.forbiddenOrigin,processor);
+ const ads=JSON.parse(fs.readFileSync('src/ads.json','utf8'));assert.equal(ads.enabled,false);assert.equal(ads.code,null);assert.ok(['pending','approved'].includes(ads.status));assert.equal(ads.permittedOrigin,guide);assert.equal(ads.forbiddenOrigin,processor);
  const s=fs.readFileSync('src/app.mjs','utf8');assert.equal((s.match(/localStorage\.setItem/g)||[]).length,1);assert.doesNotMatch(s,/sessionStorage|document\.cookie|indexedDB|fetch\s*\(|sendBeacon|postMessage/);
 });
 
