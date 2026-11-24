@@ -16,7 +16,7 @@ for(const url of routes){assert.equal(new URL(url).origin,guide,'Sitemap must us
  const verification=[...s.matchAll(/name="google-site-verification" content="([^"]*)"/g)];assert.ok(verification.length<=1,file+' duplicate GSC tag');if(verification.length)assert.ok(verification[0][1].trim(),file+' empty GSC tag');
 }
 for(const file of htmls('tools')){const s=fs.readFileSync(file,'utf8');assert.match(s,/name="robots" content="noindex,follow"/);assert.doesNotMatch(s,/google-site-verification|<iframe\b|<form\b/i);assert.doesNotMatch(s,/<script[^>]+src="(?:https?:)?\/\//i);
- for(const [,tag]of s.matchAll(/(<script\b[^>]*>)/g))assert.ok(/src="\/[\w.-]+"|type="application\/(?:ld\+json|json)"/.test(tag),file+' executable inline script');
+ for(const [,tag]of s.matchAll(/(<script\b[^>]*>)/g))assert.ok(/src="\/[\w./-]+"|type="application\/(?:ld\+json|json)"/.test(tag),file+' executable inline script');
  for(const [,href]of s.matchAll(/<link\b[^>]*(?:href)="([^"]+)"/g))assert.ok(href.startsWith('/')||href.startsWith(processor+'/'),file+' remote resource');
  assert.doesNotMatch(s,/<input[^>]+name="(?:email|password)"/i);
 }

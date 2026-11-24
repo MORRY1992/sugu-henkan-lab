@@ -48,7 +48,7 @@ test('同一オリジン・HTTPSでないURL・パス付きURLでビルドを拒
 
 test('広告の誤有効化は個別レビューなしに生成しない',()=>{
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'sugu-guard-'));
- try{for(const sub of ['scripts','src'])fs.mkdirSync(path.join(dir,sub));for(const f of ['scripts/build.mjs','src/catalog.mjs','src/controls.mjs','src/ui.mjs'])fs.copyFileSync(f,path.join(dir,f));fs.writeFileSync(path.join(dir,'src/ads.json'),JSON.stringify({enabled:true,code:null}));
+ try{for(const sub of ['scripts','src','src/mitsumori'])fs.mkdirSync(path.join(dir,sub));for(const f of ['scripts/build.mjs','src/catalog.mjs','src/controls.mjs','src/ui.mjs','src/core.mjs','src/mitsumori/pages.mjs','src/mitsumori/model.mjs'])fs.copyFileSync(f,path.join(dir,f));fs.writeFileSync(path.join(dir,'src/ads.json'),JSON.stringify({enabled:true,code:null}));
   const r=spawnSync(process.execPath,['scripts/build.mjs'],{cwd:dir,encoding:'utf8',env:{...process.env,GUIDE_ORIGIN:guide,TOOLS_ORIGIN:processor}});assert.notEqual(r.status,0);assert.match(r.stderr,/広告導入には案内側限定/);assert.equal(fs.existsSync(path.join(dir,'dist')),false);
  }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });
