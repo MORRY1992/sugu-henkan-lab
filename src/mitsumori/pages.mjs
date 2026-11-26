@@ -1,9 +1,22 @@
-import { types } from './model.mjs'
+import { sampleRows, types } from './model.mjs'
 import { esc, icon } from '../ui.mjs'
 
 export const name = '見積王'
 export const headline = name + '｜見積書・請求書・納品書を無料作成'
 export const description = '見積書・請求書・納品書を登録不要で無料作成。Excelの明細を貼り付け、見積から請求・納品へ引き継いで、スマホ・PCでA4 PDFを保存できます。'
+
+export const quoteDirectoryTool = {
+  slug: 'mitsumori',
+  name,
+  category: '帳票',
+  desc: '見積書・請求書・納品書を作成し、A4 PDFで保存。',
+  short: '作成例と使い方',
+}
+
+const tsvExample = [
+  ['品目', '数量', '単位', '単価', '税区分', '備考'],
+  ...sampleRows.map(row => [row.name, row.quantity, row.unit, row.price, row.rate + '%', row.note]),
+].map(row => row.join('\t')).join('\n')
 
 export function entry(url) {
   return `<section class="quote-entry"><div><h2>${name}</h2><p>見積書・請求書・納品書を作成し、A4 PDFで保存。</p></div><a class="button primary" href="${esc(url)}">帳票作成を開く ${icon('arrow')}</a></section>`
@@ -25,11 +38,8 @@ export function guideBody(processor) {
       <li>内容が確定したら「請求書に複製」を選び、請求日と取引日、支払期限、振込先を確認します。請求書だけを作る場合は、最初から請求書を選べます。</li>
       <li>「納品書に複製」を選び、実際の納品日と数量に合わせて調整します。価格を記載しない納品書も作成できます。</li></ol>
     </section>
-    <section class="quote-guide-section"><h2>Excel・スプレッドシートから貼る</h2><p>セルを選んでコピーし、「表から貼り付け」に入力します。列の順番は、品目、数量、単位、単価、税区分、行の備考です。最後の2列は省略できます。確認画面で列の対応を見てから追加します。</p>
-      <pre>品目　数量　単位　単価　税区分　備考
-研修会場　1　室　18000　10%　午前
-焼き菓子　12　個　350　8%　持ち帰り用
-会場費の値引き　1　式　-1000　10%</pre>
+    <section class="quote-guide-section"><h2>Excel・スプレッドシートから貼る</h2><p>セルを選んでコピーし、「表から貼り付け」に入力します。列の順番は、品目、数量、単位、単価、税区分、行の備考です。最後の2列は省略できます。確認画面で列の対応を見てから追加します。下の例はタブ区切りのため、そのまま選択してコピーできます。</p>
+      <pre id="quote-tsv-example">${esc(tsvExample)}</pre>
       <p>例えば「編集作業　1.5　時間　4000」や「取付工事　1　式　12000」のように、数量や単位を変更できます。値引きは該当する税率を選び、単価にマイナスを入力します。</p>
     </section>
     <section class="quote-guide-section"><h2>消費税と適格請求書</h2><p>通常の帳票は登録番号なしで作成できます。価格は帳票単位で税抜・税込を選択できます。消費税は税率別に対象額を集計し、1帳票につき税率ごとに1回だけ円単位に丸めます。</p>

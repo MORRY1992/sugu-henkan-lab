@@ -78,3 +78,11 @@ test('帳票案内と処理を分離し、処理に計測・自動保存・外�
     assert.doesNotMatch(code, /\b(?:fetch|sendBeacon|postMessage)\s*\(|XMLHttpRequest|localStorage|sessionStorage|indexedDB/)
   }
 })
+
+test('案内のタブ区切り見本を帳票に取り込むと同じ明細と合計になる', () => {
+  const html = readFileSync('dist/guide/tools/mitsumori/index.html', 'utf8')
+  const [, example] = html.match(/<pre id="quote-tsv-example">([^<]+)<\/pre>/)
+  const rows = parseItems(example, 'auto')
+  assert.deepEqual(rows, sampleRows)
+  assert.equal(calculate({ ...draft('quote'), rows }).total, 23236n)
+})
