@@ -9,3 +9,11 @@ test('案内→処理は本文を含まずopenerも切断',()=>{const s=fs.readF
 test('スクリプトの構文とダウンロード形式の案内',()=>{for(const p of ['src/app.mjs','src/core.mjs','src/guide.mjs'])assert.ok(fs.statSync(p).size>100);assert.match(fs.readFileSync('dist/guide/tools/csv-tsv/index.html','utf8'),/UTF-8/);assert.match(fs.readFileSync('dist/tools/THIRD_PARTY_LICENSES.txt','utf8'),/MIT License/);});
 
 test('トップの連続変換例はカナを含め既定pipelineの実出力と一致',()=>{const html=fs.readFileSync('dist/guide/index.html','utf8');const demo=html.match(/class="demo-panels"([\s\S]*?)class="demo-bottom"/)[1];const samples=[...demo.matchAll(/<pre>([\s\S]*?)<\/pre>/g)].map(m=>m[1].replace(/<br>/g,'\n'));assert.equal(samples.length,2);assert.equal(samples[1],pipeline(samples[0]).text);assert.ok(samples[1].includes('すぐ変換ﾗﾎﾞ'));});
+
+test('ホームに見積王の直接導線と帳票の検索・絞り込み対象がある', () => {
+ const home = fs.readFileSync('dist/guide/index.html', 'utf8');
+ assert.match(home, /class="hero-copy".*?href="\/tools\/mitsumori\/"/s);
+ assert.match(home, /すべて <span>9<\/span>/);
+ assert.match(home, /data-filter="帳票"/);
+ assert.match(home, /href="\/tools\/mitsumori\/" data-search="[^"]*請求書[^"]*" data-category="帳票"/);
+});

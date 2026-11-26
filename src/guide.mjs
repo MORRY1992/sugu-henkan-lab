@@ -5,7 +5,7 @@ if(search){
  let category='all';
  function update(){
   const q=search.value.trim().toLocaleLowerCase('ja');let n=0;
-  for(const card of cards){const data=card.dataset.search;const inCategory=category==='all'||(category==='Web'?/ Web | QR /.test(data):data.includes(' '+category+' '));const hit=inCategory&&data.toLocaleLowerCase('ja').includes(q);card.hidden=!hit;if(hit)n++;}
+  for(const card of cards){const data=card.dataset.search;const inCategory=category==='all'||card.dataset.category===category;const hit=inCategory&&data.toLocaleLowerCase('ja').includes(q);card.hidden=!hit;if(hit)n++;}
   document.querySelector('#search-result').textContent=q||category!=='all'?`${n}件のツールが見つかりました。`:'';
   document.querySelector('#search-empty').hidden=n!==0;
   for(const button of filters){const active=button.dataset.filter===category;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));}
