@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
 import { calculate, convertQuote, draft, parseItems, sampleRows, validate } from '../src/mitsumori/model.mjs'
+import { renderPages } from '../src/mitsumori/pdf.mjs'
 
 const row = (price, rate = '10', quantity = '1') => ({ name: '品目', quantity, unit: '式', price, rate, note: '' })
 
@@ -85,4 +86,34 @@ test('案内のタブ区切り見本を帳票に取り込むと同じ明細と�
   const rows = parseItems(example, 'auto')
   assert.deepEqual(rows, sampleRows)
   assert.equal(calculate({ ...draft('quote'), rows }).total, 23236n)
+})
+
+test('軽減税率を含む合計欄は改ページをまたがない', (t) => {
+  globalThis.document = {
+    createElement() {
+      const drawnText = []
+      const context = {
+        fillText: (text) => drawnText.push(text),
+        measureText: (text) => ({ width: text.length * 5 }),
+        fillRect() {},
+        scale() {},
+      }
+      return { drawnText, getContext: () => context, setAttribute() {} }
+    },
+  }
+  t.after(() => { delete globalThis.document })
+
+  const rates = ['10', '8', 'none']
+  const rows = Array.from({ length: 17 }, (_, index) => ({
+    ...row('100', rates[index % rates.length]),
+    note: index === 0 ? '一行目\n二行目' : '',
+  }))
+  const record = {
+    ...draft('quote', '2026-11-27'), recipient: '架空の宛先', issuer: '架空の発行者', rows,
+  }
+  const pages = renderPages(record, validate(record))
+  const summary = ['※ 軽減税率の対象品目', '10%', '8%（軽減）', '税計上なし', '消費税合計', '合計（税込）']
+
+  assert.equal(pages.length, 2)
+  assert.deepEqual(pages[1].drawnText.filter(text => summary.includes(text)), summary)
 })
