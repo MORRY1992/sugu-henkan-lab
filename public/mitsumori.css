@@ -63,3 +63,21 @@
   .quote-hero { padding-block: 14px 34px; }
   .quote-entry p { font-size: .86rem; }
 }
+
+.document-intro { padding: 1.2rem 0 1.5rem; border-bottom: 2px solid #24473e; }
+.document-intro h1 { font-size: clamp(1.8rem, 4.2vw, 3.65rem); line-height: 1.35; margin: .22em 0; }
+.document-intro > p:last-child { margin: .65rem 0 0; max-width: 47em; line-height: 1.8; }
+.document-gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 0; margin: 1.3rem 0 0; gap: clamp(12px, 2vw, 32px); list-style: none; }
+.document-sheet { display: block; padding: clamp(12px, 2vw, 28px); background: #e6eae5; text-decoration: none; }
+.document-sheet img { display: block; width: 100%; height: auto; border: 1px solid #a8b4ae; box-shadow: 2px 3px 0 #bfcac3; }
+.document-caption h2 { margin: .65em 0 .15em; font-family: "Yu Mincho", "Hiragino Mincho ProN", serif; font-size: 1.5rem; }
+.document-caption p { font-size: .94rem; line-height: 1.65; }
+.document-caption a { display: inline-flex; gap: .6em; align-items: center; min-height: 44px; font-weight: 700; text-decoration: underline; text-underline-offset: .22em; }
+.document-caption svg { width: 1em; height: 1em; }
+.document-note { border-block: 1px solid #b8c6bf; padding-block: .9em; margin: 1rem 0; color: #40554c; line-height: 1.7; }
+@media (max-width: 680px) {
+  .document-gallery { display: block; }
+  .document-specimen { display: grid; grid-template-columns: minmax(66px, 29%) minmax(0, 1fr); align-items: center; gap: 16px; padding-block: .65rem; border-bottom: 1px solid #cad3ce; }
+  .document-sheet { padding: 6px; }
+  .document-caption h2 { margin-top: 0; }
+}

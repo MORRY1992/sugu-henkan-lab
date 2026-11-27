@@ -25,14 +25,28 @@ export function entry(url) {
 export function guideBody(processor) {
   const starts = Object.entries(types).map(([type, doc]) =>
     `<a class="button primary" href="${processor}/mitsumori/?type=${type}" rel="noreferrer">${doc.name}を作る ${icon('arrow')}</a>`).join('')
+  const purpose = {
+    quote: '金額と見積有効期限を提示する',
+    invoice: '支払期限と振込先を伝える',
+    delivery: '納品した品目と数量を伝える',
+  }
+  const specimens = Object.entries(types).map(([type, doc]) => `
+    <li class="document-specimen">
+      <a class="document-sheet" href="/document-samples/${type}.webp" aria-label="${doc.name}のA4見本を拡大">
+        <img src="/document-samples/${type}.webp" alt="${doc.name}の架空の記入例" width="849" height="1200">
+      </a>
+      <div class="document-caption"><h2>${doc.name}</h2><p>${purpose[type]}</p>
+        <a href="${processor}/mitsumori/?type=${type}" rel="noreferrer">${doc.name}を作る ${icon('arrow')}</a>
+      </div>
+    </li>`).join('')
   return `<article class="wrap quote-guide">
     <div class="breadcrumb"><a href="/">ツール一覧</a><span>/</span>帳票作成</div>
-    <header class="quote-hero">
-      <div><p class="quote-kicker">${name}</p><h1>見積書・請求書・納品書を無料作成</h1>
-      <p class="lead">表の明細を貼り付けて、A4のPDFに。見積書の宛先と明細は、請求書や納品書に引き継げます。</p>
-      <div class="quote-actions">${starts}</div><p class="quote-small">登録不要・作成件数の上限なし・透かしなし</p></div>
-      <aside class="quote-receipt"><p>架空の見積書</p><strong>青葉企画 様</strong><p>半日の社内研修会場</p><dl><dt>会場費（10%）</dt><dd>18,000円</dd><dt>持ち帰り用の焼き菓子（8%）</dt><dd>4,200円</dd><dt>会場費の値引き（10%）</dt><dd>−1,000円</dd><dt>消費税合計</dt><dd>2,036円</dd></dl><p class="quote-receipt-total">税込合計 <b>23,236円</b></p></aside>
+    <header class="document-intro">
+      <p class="quote-kicker">${name}</p><h1>見積書・請求書・納品書を無料作成</h1>
+      <p>同じ架空取引から作った3種類のA4見本です。見本を押すと拡大できます。宛先と明細は次の帳票に引き継げます。</p>
     </header>
+    <ul class="document-gallery" aria-label="帳票の見本と作成">${specimens}</ul>
+    <p class="document-note">作例は青葉企画の研修会場費・菓子代・値引きの3明細。税額2,036円、税込合計23,236円です。</p>
     <section class="quote-guide-section"><h2>同じ取引の3帳票を作る</h2>
       <ol><li>見積書で「青葉企画 様」などの宛先、発行者、見積日、有効期限を入力します。品目・数量・単位・単価を入力し、プレビューからPDFを保存します。</li>
       <li>内容が確定したら「請求書に複製」を選び、請求日と取引日、支払期限、振込先を確認します。請求書だけを作る場合は、最初から請求書を選べます。</li>
