@@ -54,22 +54,42 @@ test('広告の誤有効化は個別レビューなしに生成しない',()=>{
 });
 
 // Small event-driven DOM harness: exercises real app + core behavior without new dependencies.
-function app(tool,optionValues={}){
+function app(tool,optionValues={},{clipboardBlocked=false}={}){
  const elements=new Map();
- function el(){return {value:'',textContent:'',hidden:false,disabled:false,dataset:{},children:[],listeners:{},classList:{toggle(){}},replaceChildren(...x){this.children=x;},append(...x){this.children.push(...x);},addEventListener(name,fn){this.listeners[name]=fn;},focus(){},select(){},setAttribute(){},matches(selector){return selector==='input[type="number"][name]'&&this.type==='number'&&Boolean(this.name);}};}
+ let focused=null, selected=null;
+ function el(){return {value:'',textContent:'',hidden:false,disabled:false,dataset:{},children:[],listeners:{},classList:{toggle(){}},replaceChildren(...x){this.children=x;},append(...x){this.children.push(...x);},addEventListener(name,fn){this.listeners[name]=fn;},focus(){focused=this;},select(){selected=this;},getContext(){return {fillRect(){}};},setAttribute(){},matches(selector){return selector==='input[type="number"][name]'&&this.type==='number'&&Boolean(this.name);}};}
  for(const id of ['input','output','status','qr-canvas','stats','table','result-empty','result-tag','empty-title','empty-copy','input-size','options','run','sample','reset','copy','tool-switch','save-settings','delete-settings','sample-data'])elements.set('#'+id,el());
  elements.get('#sample-data').textContent=JSON.stringify(' Ａ \nA\nＢ\nB');
  const opts=Object.entries(optionValues).map(([name,value])=>({...el(),name,type:typeof value==='boolean'?'checkbox':typeof value==='number'?'number':'select',checked:value,value:typeof value==='boolean'?value:String(value)}));
  const buttons=[elements.get('#copy')];let copied=null;const saved=new Map();const windowEvents={};
  const document={body:{dataset:{tool}},querySelector:s=>elements.get(s)||null,querySelectorAll:s=>s==='[data-result]'?buttons:s==='#options [name]'?opts:s==='#options input[type=checkbox]'?opts.filter(x=>x.type==='checkbox'):[],createDocumentFragment:el,createElement:el};
+ const qrcode=()=>({addData(){},make(){},getModuleCount(){return 21;},isDark(){return false;}});
+ qrcode.stringToBytesFuncs={'UTF-8':text=>new TextEncoder().encode(text)};
  const source=fs.readFileSync('src/app.mjs','utf8').replace(/^import .*;\n/gm,'');
- vm.runInNewContext(source,{...core,document,navigator:{clipboard:{writeText:async s=>{copied=s;}}},window:{addEventListener:(k,v)=>{windowEvents[k]=v;}},localStorage:{getItem:k=>saved.get(k)||null,setItem:(k,v)=>saved.set(k,v),removeItem:k=>saved.delete(k)},TextEncoder,Intl,console,qrcode(){},URL,Blob,setTimeout});
- return {elements,opts,buttons,document,saved,windowEvents,get copied(){return copied;},event(id,event='click',e={}){return elements.get('#'+id).listeners[event]?.(e);}};
+ vm.runInNewContext(source,{...core,document,navigator:{clipboard:{writeText:async s=>{if(clipboardBlocked)throw new Error('clipboard blocked');copied=s;}}},window:{addEventListener:(k,v)=>{windowEvents[k]=v;}},localStorage:{getItem:k=>saved.get(k)||null,setItem:(k,v)=>saved.set(k,v),removeItem:k=>saved.delete(k)},TextEncoder,Intl,console,qrcode,URL,Blob,setTimeout});
+ return {elements,opts,buttons,document,saved,windowEvents,get copied(){return copied;},get focused(){return focused;},get selected(){return selected;},event(id,event='click',e={}){return elements.get('#'+id).listeners[event]?.(e);}};
 }
 
 test('実行→入力変更で古い結果とコピーを無効化し、消去で本文を残さない',async()=>{
  const a=app('width-converter',{direction:'half',alpha:true,symbol:true,kana:true,space:true});a.elements.get('#input').value='ＡＢＣ　ガイド';a.event('run');assert.equal(a.elements.get('#output').value,'ABC ｶﾞｲﾄﾞ');assert.equal(a.document.body.dataset.state,'success');assert.equal(a.elements.get('#result-empty').hidden,true);assert.equal(a.buttons[0].disabled,false);await a.event('copy');assert.equal(a.copied,'ABC ｶﾞｲﾄﾞ');
  a.elements.get('#input').value+='！';a.event('input','input');assert.equal(a.elements.get('#output').value,'');assert.equal(a.buttons[0].disabled,true);assert.equal(a.document.body.dataset.state,'empty');a.event('reset');assert.equal(a.elements.get('#input').value,'');assert.equal(a.elements.get('#input-size').textContent,'0 B');
+});
+
+test('自動コピーが拒否されたときにQRの元データと通常ツールの結果を選択する',async()=>{
+ for(const [tool,options,source,target,expected] of [
+  ['qr-generator',{size:'512'},'https://example.com/架空','#input','https://example.com/架空'],
+  ['width-converter',{direction:'half',alpha:true},'ＡＢＣ','#output','ABC'],
+ ]){
+  const a=app(tool,options,{clipboardBlocked:true});
+  a.elements.get('#input').value=source;
+  a.event('run');
+  assert.equal(a.document.body.dataset.state,'success');
+  await a.event('copy');
+  assert.equal(a.focused,a.elements.get(target));
+  assert.equal(a.selected,a.focused);
+  assert.equal(a.selected.value,expected);
+  assert.match(a.elements.get('#status').textContent,/自動コピーを利用できません/);
+ }
 });
 
 test('JSONエラーは入力を維持し、訂正後のショートカット実行で復旧',()=>{
