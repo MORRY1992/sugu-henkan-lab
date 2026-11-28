@@ -14,7 +14,21 @@ output.value=tool==='qr-generator'?'':result;valid=true;present('success');for(c
 $('#run').addEventListener('click',execute);input.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'&&!e.isComposing){e.preventDefault();execute();}});input.addEventListener('input',invalidate);$('#options').addEventListener('change',invalidate);$('#options').addEventListener('input',e=>{if(e.target?.matches?.('input[type="number"][name]'))invalidate();});
 $('#sample').addEventListener('click',()=>{input.value=JSON.parse(document.querySelector('#sample-data').textContent);invalidate();input.focus();});
 $('#reset').addEventListener('click',()=>{input.value='';invalidate();setStatus('入力と結果を消去しました。保存済みの設定と端末へ保存したファイルは残ります。');input.focus();});
-$('#copy').addEventListener('click',async()=>{if(!valid)return;try{await navigator.clipboard.writeText(result);setStatus('結果をコピーしました。');}catch{output.focus();output.select();setStatus('自動コピーを利用できません。結果を長押しまたは Ctrl/Cmd+C でコピーしてください。',true);}});
+$('#copy').addEventListener('click', async () => {
+  if (!valid) return;
+  try {
+    await navigator.clipboard.writeText(result);
+    setStatus('結果をコピーしました。');
+  } catch {
+    if (!valid) return;
+    const isQR = tool === 'qr-generator';
+    const field = isQR ? input : output;
+    field.focus();
+    field.select();
+    const label = isQR ? '入力したURLや文章' : '結果';
+    setStatus(`自動コピーを利用できません。${label}を長押し、または Ctrl/Cmd+C でコピーしてください。`, true);
+  }
+});
 function saveBlob(blob,name){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.rel='noopener';a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);}
 $('#save')?.addEventListener('click',()=>{if(!valid)return;const o=values();let ext=tool==='json-formatter'?'json':tool==='csv-tsv'?(o.from==='csv'?'tsv':'csv'):'txt';const data=(o.bom?'\uFEFF':'')+result;saveBlob(new Blob([data],{type:'text/plain;charset=utf-8'}),`sugu-henkan.${ext}`);setStatus('保存を開始しました。ブラウザのダウンロード一覧をご確認ください。');});
 $('#save-png')?.addEventListener('click',()=>{if(!valid)return;canvas.toBlob(blob=>{if(blob){saveBlob(blob,'sugu-henkan-qr.png');setStatus('PNG画像の保存を開始しました。');}else setStatus('画像を保存できませんでした。',true);},'image/png');});
