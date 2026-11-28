@@ -6,6 +6,9 @@ const margin = 43
 const contentWidth = pageWidth - margin * 2
 const bottom = pageHeight - 54
 const scale = 2.5
+const lineHeight = 18
+const fieldGap = 4
+const totalRuleGap = 11
 const ink = '#162c28'
 const accent = '#346558'
 const border = '#d9e4de'
@@ -69,7 +72,7 @@ export function renderPages(record, totals) {
     font(size, bold)
     const items = wrap(context, value, contentWidth - 110)
     items.forEach((line, index) => {
-      ensure(18)
+      ensure(lineHeight)
       font(size, bold)
       if (index === 0) {
         font()
@@ -77,9 +80,9 @@ export function renderPages(record, totals) {
         font(size, bold)
       }
       text(line, margin + 105, y)
-      y += 18
+      y += lineHeight
     })
-    y += 4
+    y += fieldGap
   }
   function tableHead() {
     ensure(46)
@@ -138,8 +141,10 @@ export function renderPages(record, totals) {
   }
   y += 18
   if (!totals.hidePrices) {
-    ensure(68 + totals.groups.length * 22)
-    if (totals.groups.some(group => group.rate === '8')) lines('※ 軽減税率の対象品目', '税率')
+    const hasReducedRate = totals.groups.some(group => group.rate === '8')
+    const summaryLines = totals.groups.length + 2 + Number(hasReducedRate)
+    ensure(summaryLines * (lineHeight + fieldGap) + totalRuleGap)
+    if (hasReducedRate) lines('※ 軽減税率の対象品目', '税率')
     const taxMode = record.taxMode === 'inclusive' ? '税込' : '税抜'
     for (const group of totals.groups) {
       const amount = group.rate === 'none'
@@ -149,7 +154,7 @@ export function renderPages(record, totals) {
     }
     lines(yen(totals.tax), '消費税合計')
     rectangle(margin, y, contentWidth, 1, accent)
-    y += 11
+    y += totalRuleGap
     lines(yen(totals.total), '合計（税込）', true)
   }
   if (record.type === 'invoice') lines(record.bank, '振込先')
